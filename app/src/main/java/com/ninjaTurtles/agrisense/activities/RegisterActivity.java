@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.Html;
 import android.text.InputType;
 import android.text.TextUtils;
 import android.view.View;
@@ -24,7 +25,7 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText etFullName, etRegEmail, etMobileNumber, etFarmName, etRegPassword, etConfirmPassword;
     private CheckBox cbTerms;
     private MaterialButton btnRegister;
-    private TextView tvLoginLink;
+    private TextView tvLoginLink, tvTermsText;
 
     private boolean isPasswordVisible = false;
     private boolean isConfirmPasswordVisible = false;
@@ -44,8 +45,11 @@ public class RegisterActivity extends AppCompatActivity {
         imgToggleRegPassword = findViewById(R.id.imgToggleRegPassword);
         imgToggleConfirmPassword = findViewById(R.id.imgToggleConfirmPassword);
         cbTerms = findViewById(R.id.cbTerms);
+        tvTermsText = findViewById(R.id.tvTermsText);
         btnRegister = findViewById(R.id.btnRegister);
         tvLoginLink = findViewById(R.id.tvLoginLink);
+
+        setupLabelAsterisks();
 
         // Back button navigation
         if (btnBack != null) {
@@ -136,6 +140,26 @@ public class RegisterActivity extends AppCompatActivity {
                 overridePendingTransition(R.anim.slide_in_left, R.anim.slide_out_right);
             }
         });
+    }
+
+    private void setupLabelAsterisks() {
+        setRedAsterisk(R.id.lblFullName, "Full Name");
+        setRedAsterisk(R.id.lblEmail, "Email Address");
+        setRedAsterisk(R.id.lblMobile, "Mobile Number");
+        setRedAsterisk(R.id.lblFarm, "Farm / Estate Name");
+        setRedAsterisk(R.id.lblPassword, "Password");
+        setRedAsterisk(R.id.lblConfirmPassword, "Confirm Password");
+
+        if (tvTermsText != null) {
+            tvTermsText.setText(Html.fromHtml("I agree to the <font color='#2E7D32'><b>Terms of Service</b></font> &amp; <font color='#2E7D32'><b>Privacy Policy</b></font>"));
+        }
+    }
+
+    private void setRedAsterisk(int viewId, String label) {
+        TextView tv = findViewById(viewId);
+        if (tv != null) {
+            tv.setText(Html.fromHtml(label + " <font color='#C62828'>*</font>"));
+        }
     }
 
     @Override

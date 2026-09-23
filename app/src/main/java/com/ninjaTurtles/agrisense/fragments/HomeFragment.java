@@ -7,58 +7,48 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import com.ninjaTurtles.agrisense.R;
 import com.ninjaTurtles.agrisense.activities.IrrigationActivity;
 import com.ninjaTurtles.agrisense.activities.RecommendationsActivity;
 import com.ninjaTurtles.agrisense.activities.SensorDataActivity;
-import com.ninjaTurtles.agrisense.adapters.RecommendationAdapter;
 import com.ninjaTurtles.agrisense.models.IrrigationStatus;
-import com.ninjaTurtles.agrisense.models.Recommendation;
 import com.ninjaTurtles.agrisense.models.SensorData;
-import com.ninjaTurtles.agrisense.models.WeatherInfo;
 import com.ninjaTurtles.agrisense.utils.AnimationHelper;
 import com.ninjaTurtles.agrisense.viewmodels.HomeViewModel;
 import com.google.android.material.button.MaterialButton;
 import com.google.android.material.card.MaterialCardView;
 
-import java.util.List;
-
 public class HomeFragment extends Fragment {
 
     private HomeViewModel viewModel;
 
-    private View headerHome, viewLiveDot;
-    private MaterialCardView cardMoisture, cardTemp, cardHumidity, cardTank, cardIrrigationControl, cardWeather;
+    private MaterialCardView cardMoisture, cardTemp, cardHumidity, cardTank, cardIrrigationControl;
+    private MaterialCardView cardRecCrop, cardRecIrrigation, cardRecFertilizer, cardViewAllSensors;
     private TextView tvValueMoisture, tvValueTemp, tvValueHumidity, tvValueTank, tvHomePumpStatus;
-    private TextView tvWeatherCondition, tvWeatherLocation, tvWeatherTemp, tvViewAllRecommendations;
+    private ProgressBar pbMoisture, pbTemp, pbHumidity, pbTank;
     private MaterialButton btnQuickControlIrrigation;
-    private RecyclerView rvHomeRecommendations;
-
-    private RecommendationAdapter adapter;
+    private ImageView btnNotificationBell;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_home, container, false);
 
-        headerHome = v.findViewById(R.id.headerHome);
-        viewLiveDot = v.findViewById(R.id.viewLiveDot);
-
         cardMoisture = v.findViewById(R.id.cardMoisture);
         cardTemp = v.findViewById(R.id.cardTemp);
         cardHumidity = v.findViewById(R.id.cardHumidity);
         cardTank = v.findViewById(R.id.cardTank);
         cardIrrigationControl = v.findViewById(R.id.cardIrrigationControl);
-        cardWeather = v.findViewById(R.id.cardWeather);
 
         tvValueMoisture = v.findViewById(R.id.tvValueMoisture);
         tvValueTemp = v.findViewById(R.id.tvValueTemp);
@@ -66,17 +56,18 @@ public class HomeFragment extends Fragment {
         tvValueTank = v.findViewById(R.id.tvValueTank);
         tvHomePumpStatus = v.findViewById(R.id.tvHomePumpStatus);
 
-        tvWeatherCondition = v.findViewById(R.id.tvWeatherCondition);
-        tvWeatherLocation = v.findViewById(R.id.tvWeatherLocation);
-        tvWeatherTemp = v.findViewById(R.id.tvWeatherTemp);
-        tvViewAllRecommendations = v.findViewById(R.id.tvViewAllRecommendations);
+        pbMoisture = v.findViewById(R.id.pbMoisture);
+        pbTemp = v.findViewById(R.id.pbTemp);
+        pbHumidity = v.findViewById(R.id.pbHumidity);
+        pbTank = v.findViewById(R.id.pbTank);
 
         btnQuickControlIrrigation = v.findViewById(R.id.btnQuickControlIrrigation);
-        rvHomeRecommendations = v.findViewById(R.id.rvHomeRecommendations);
+        btnNotificationBell = v.findViewById(R.id.btnNotificationBell);
 
-        rvHomeRecommendations.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new RecommendationAdapter();
-        rvHomeRecommendations.setAdapter(adapter);
+        cardRecCrop = v.findViewById(R.id.cardRecCrop);
+        cardRecIrrigation = v.findViewById(R.id.cardRecIrrigation);
+        cardRecFertilizer = v.findViewById(R.id.cardRecFertilizer);
+        cardViewAllSensors = v.findViewById(R.id.cardViewAllSensors);
 
         setupClickListeners();
 
@@ -90,8 +81,6 @@ public class HomeFragment extends Fragment {
         viewModel = new ViewModelProvider(this).get(HomeViewModel.class);
 
         runStaggeredDashboardAnimations();
-        AnimationHelper.startPulse(getContext(), viewLiveDot);
-
         observeViewModel();
     }
 
@@ -100,42 +89,29 @@ public class HomeFragment extends Fragment {
             @Override
             public void onChanged(SensorData data) {
                 if (data != null) {
-                    AnimationHelper.animateNumberValue(tvValueMoisture, 0, data.getSoilMoisture(), "%", 800);
-                    AnimationHelper.animateNumberValue(tvValueHumidity, 0, data.getHumidity(), "%", 800);
-                    AnimationHelper.animateNumberValue(tvValueTank, 0, data.getWaterTankLevel(), "%", 800);
-                    tvValueTemp.setText(data.getTemperature() + "°C");
-                }
-            }
-        });
+                    if (tvValueMoisture != null) tvValueMoisture.setText(String.valueOf(data.getSoilMoisture()));
+                    if (tvValueHumidity != null) tvValueHumidity.setText(String.valueOf(data.getHumidity()));
+                    if (tvValueTank != null) tvValueTank.setText(String.valueOf(data.getWaterTankLevel()));
+                    if (tvValueTemp != null) tvValueTemp.setText(String.valueOf((int) data.getTemperature()));
 
-        viewModel.getWeatherInfo().observe(getViewLifecycleOwner(), new Observer<WeatherInfo>() {
-            @Override
-            public void onChanged(WeatherInfo weather) {
-                if (weather != null) {
-                    tvWeatherCondition.setText(weather.getCondition());
-                    tvWeatherLocation.setText(weather.getLocation() + " • " + weather.getRainProbability() + "% Rain Prob");
-                    tvWeatherTemp.setText(weather.getTemperature() + "°C");
+                    if (pbMoisture != null) pbMoisture.setProgress(data.getSoilMoisture());
+                    if (pbHumidity != null) pbHumidity.setProgress(data.getHumidity());
+                    if (pbTank != null) pbTank.setProgress(data.getWaterTankLevel());
+                    if (pbTemp != null) pbTemp.setProgress((int) Math.min(100, (data.getTemperature() / 50.0) * 100));
                 }
-            }
-        });
-
-        viewModel.getRecommendations().observe(getViewLifecycleOwner(), new Observer<List<Recommendation>>() {
-            @Override
-            public void onChanged(List<Recommendation> recommendations) {
-                adapter.setRecommendations(recommendations);
             }
         });
 
         viewModel.getIrrigationStatus().observe(getViewLifecycleOwner(), new Observer<IrrigationStatus>() {
             @Override
             public void onChanged(IrrigationStatus status) {
-                if (status != null) {
+                if (status != null && tvHomePumpStatus != null) {
                     if (status.getPumpState() == IrrigationStatus.PumpState.ON) {
-                        tvHomePumpStatus.setText(getString(R.string.pump_status_on));
+                        tvHomePumpStatus.setText("Pump: ON");
                     } else if (status.getPumpState() == IrrigationStatus.PumpState.STARTING) {
-                        tvHomePumpStatus.setText(getString(R.string.pump_status_starting));
+                        tvHomePumpStatus.setText("Pump: STARTING");
                     } else {
-                        tvHomePumpStatus.setText(getString(R.string.pump_status_off));
+                        tvHomePumpStatus.setText("Pump: OFF");
                     }
                 }
             }
@@ -145,59 +121,67 @@ public class HomeFragment extends Fragment {
     private void runStaggeredDashboardAnimations() {
         if (getContext() == null) return;
 
-        // Header fade in
-        Animation fadeIn = AnimationUtils.loadAnimation(getContext(), R.anim.fade_in);
-        headerHome.startAnimation(fadeIn);
+        if (cardMoisture != null) {
+            Animation anim1 = AnimationUtils.loadAnimation(getContext(), R.anim.slide_up);
+            anim1.setStartOffset(100);
+            cardMoisture.startAnimation(anim1);
+        }
 
-        // Sensor Cards staggered entry
-        Animation anim1 = AnimationUtils.loadAnimation(getContext(), R.anim.slide_up);
-        anim1.setStartOffset(100);
-        cardMoisture.startAnimation(anim1);
+        if (cardTemp != null) {
+            Animation anim2 = AnimationUtils.loadAnimation(getContext(), R.anim.slide_up);
+            anim2.setStartOffset(180);
+            cardTemp.startAnimation(anim2);
+        }
 
-        Animation anim2 = AnimationUtils.loadAnimation(getContext(), R.anim.slide_up);
-        anim2.setStartOffset(180);
-        cardTemp.startAnimation(anim2);
-
-        Animation anim3 = AnimationUtils.loadAnimation(getContext(), R.anim.slide_up);
-        anim3.setStartOffset(260);
-        cardHumidity.startAnimation(anim3);
-
-        Animation anim4 = AnimationUtils.loadAnimation(getContext(), R.anim.slide_up);
-        anim4.setStartOffset(340);
-        cardTank.startAnimation(anim4);
-
-        // Irrigation Card scale/fade
-        Animation scaleAnim = AnimationUtils.loadAnimation(getContext(), R.anim.scale_up);
-        scaleAnim.setStartOffset(400);
-        cardIrrigationControl.startAnimation(scaleAnim);
-
-        // Weather card fade
-        Animation fadeWeather = AnimationUtils.loadAnimation(getContext(), R.anim.fade_in);
-        fadeWeather.setStartOffset(480);
-        cardWeather.startAnimation(fadeWeather);
+        if (cardIrrigationControl != null) {
+            Animation scaleAnim = AnimationUtils.loadAnimation(getContext(), R.anim.scale_up);
+            scaleAnim.setStartOffset(300);
+            cardIrrigationControl.startAnimation(scaleAnim);
+        }
     }
 
     private void setupClickListeners() {
-        btnQuickControlIrrigation.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AnimationHelper.animateButtonPress(getContext(), btnQuickControlIrrigation);
-                startActivity(new Intent(getActivity(), IrrigationActivity.class));
-            }
-        });
+        if (btnQuickControlIrrigation != null) {
+            btnQuickControlIrrigation.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    AnimationHelper.animateButtonPress(getContext(), btnQuickControlIrrigation);
+                    startActivity(new Intent(getActivity(), IrrigationActivity.class));
+                }
+            });
+        }
 
-        cardMoisture.setOnClickListener(new View.OnClickListener() {
+        if (btnNotificationBell != null) {
+            btnNotificationBell.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Toast.makeText(getContext(), "You have 2 new alerts & advisories", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+        View.OnClickListener openSensorsListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getActivity(), SensorDataActivity.class));
             }
-        });
+        };
 
-        tvViewAllRecommendations.setOnClickListener(new View.OnClickListener() {
+        if (cardMoisture != null) cardMoisture.setOnClickListener(openSensorsListener);
+        if (cardTemp != null) cardTemp.setOnClickListener(openSensorsListener);
+        if (cardHumidity != null) cardHumidity.setOnClickListener(openSensorsListener);
+        if (cardTank != null) cardTank.setOnClickListener(openSensorsListener);
+        if (cardViewAllSensors != null) cardViewAllSensors.setOnClickListener(openSensorsListener);
+
+        View.OnClickListener openRecsListener = new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 startActivity(new Intent(getActivity(), RecommendationsActivity.class));
             }
-        });
+        };
+
+        if (cardRecCrop != null) cardRecCrop.setOnClickListener(openRecsListener);
+        if (cardRecIrrigation != null) cardRecIrrigation.setOnClickListener(openRecsListener);
+        if (cardRecFertilizer != null) cardRecFertilizer.setOnClickListener(openRecsListener);
     }
 }

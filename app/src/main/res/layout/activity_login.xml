@@ -88,10 +88,10 @@
         <!-- Brand Logo -->
         <ImageView
             android:id="@+id/imgLoginLogo"
-            android:layout_width="80dp"
-            android:layout_height="80dp"
+            android:layout_width="105dp"
+            android:layout_height="104dp"
             android:layout_marginTop="8dp"
-            android:src="@drawable/ic_agrisense_logo" />
+            android:src="@drawable/agrisense_ai_logo" />
 
         <!-- Brand Title: AgriSense AI -->
         <LinearLayout
