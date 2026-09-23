@@ -8,12 +8,48 @@
     <string name="email">Email Address</string>
     <string name="password">Password</string>
     <string name="forgot_password">Forgot Password?</string>
-    <string name="dont_have_account">Don\'t have an account? Register</string>
-    <string name="already_have_account">Already have an account? Login</string>
+    <string name="dont_have_account">Don\'t have an account?</string>
+    <string name="already_have_account">Already have an account?</string>
     <string name="full_name">Full Name</string>
     <string name="farm_name_input">Farm Name</string>
     <string name="reset_password">Reset Password</string>
     <string name="send_reset_link">Send Reset Link</string>
+    
+    <!-- Redesign Auth Strings -->
+    <string name="ai_core_connected">AI Core Connected</string>
+    <string name="english">English</string>
+    <string name="welcome_back_title">Welcome Back!</string>
+    <string name="login_subtitle">Log in to monitor your farm &amp; crops</string>
+    <string name="email_placeholder">farmer@agrisense.com</string>
+    <string name="password_placeholder">Enter your security passkey</string>
+    <string name="login_btn_text">LOGIN</string>
+    <string name="or_divider">OR</string>
+    <string name="login_mobile_otp">Log in with Mobile OTP</string>
+    <string name="login_fingerprint">Touch fingerprint sensor to sign in</string>
+    <string name="plot_name_demo">Valley East Plot 04</string>
+    <string name="plot_status_demo">24°C • Soil Moisture 68% (Optimal)</string>
+
+    <string name="create_account_title">Create Account</string>
+    <string name="register_banner_title">AgriSense AI • Smart Farming</string>
+    <string name="register_banner_sub">Join AgriSense AI to connect your farm sensors and receive predictive crop advisories.</string>
+    <string name="full_name_label">Full Name *</string>
+    <string name="full_name_hint">e.g. Ramesh Patel</string>
+    <string name="email_label">Email Address *</string>
+    <string name="email_reg_hint">e.g. ramesh.farmer@gmail.com</string>
+    <string name="mobile_label">Mobile Number *</string>
+    <string name="mobile_hint">98765 43210</string>
+    <string name="farm_label">Farm / Estate Name *</string>
+    <string name="farm_hint">e.g. Green Valley Farms</string>
+    <string name="password_label">Password *</string>
+    <string name="password_min_char">Min. 8 characters</string>
+    <string name="password_reg_hint">Create secure password</string>
+    <string name="confirm_password_label">Confirm Password *</string>
+    <string name="confirm_password_hint">Re-enter password</string>
+    <string name="terms_agree">I agree to the Terms of Service &amp; Privacy Policy</string>
+    <string name="create_account_btn">CREATE ACCOUNT</string>
+    <string name="security_encrypted">IoT Cloud Ready • End-to-End Encrypted</string>
+    <string name="version_badge">v2.4</string>
+    <string name="already_account_login">Already have an account? Log In</string>
     
     <!-- Navigation Strings -->
     <string name="nav_home">Home</string>

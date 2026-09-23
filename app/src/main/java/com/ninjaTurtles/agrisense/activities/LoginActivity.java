@@ -4,11 +4,13 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.text.InputType;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,15 +18,15 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.ninjaTurtles.agrisense.R;
 import com.ninjaTurtles.agrisense.utils.AnimationHelper;
 import com.google.android.material.button.MaterialButton;
-import com.google.android.material.textfield.TextInputLayout;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private ImageView imgLogo;
-    private TextInputLayout tilEmail, tilPassword;
+    private ImageView imgLogo, imgTogglePassword;
     private MaterialButton btnLogin;
+    private LinearLayout btnMobileOtp, btnFingerprint;
     private TextView tvRegisterLink, tvForgotPassword;
     private EditText etEmail, etPassword;
+    private boolean isPasswordVisible = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,20 +34,37 @@ public class LoginActivity extends AppCompatActivity {
         setContentView(R.layout.activity_login);
 
         imgLogo = findViewById(R.id.imgLoginLogo);
-        tilEmail = findViewById(R.id.tilEmail);
-        tilPassword = findViewById(R.id.tilPassword);
         btnLogin = findViewById(R.id.btnLogin);
+        btnMobileOtp = findViewById(R.id.btnMobileOtp);
+        btnFingerprint = findViewById(R.id.btnFingerprint);
         tvRegisterLink = findViewById(R.id.tvRegisterLink);
         tvForgotPassword = findViewById(R.id.tvForgotPassword);
         etEmail = findViewById(R.id.etEmail);
         etPassword = findViewById(R.id.etPassword);
+        imgTogglePassword = findViewById(R.id.imgTogglePassword);
 
-        // Pre-fill demo credentials
-        etEmail.setText("demo@agrisense");
-        etPassword.setText("password123");
+        // Pre-fill demo credentials matching design
+        etEmail.setText("farmer@agrisense.com");
 
         runStaggeredEntryAnimations();
 
+        // Password visibility toggle
+        if (imgTogglePassword != null) {
+            imgTogglePassword.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    isPasswordVisible = !isPasswordVisible;
+                    if (isPasswordVisible) {
+                        etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_VISIBLE_PASSWORD);
+                    } else {
+                        etPassword.setInputType(InputType.TYPE_CLASS_TEXT | InputType.TYPE_TEXT_VARIATION_PASSWORD);
+                    }
+                    etPassword.setSelection(etPassword.getText().length());
+                }
+            });
+        }
+
+        // Primary Login button
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -62,6 +81,29 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+        // Mobile OTP button
+        if (btnMobileOtp != null) {
+            btnMobileOtp.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    AnimationHelper.animateButtonPress(LoginActivity.this, btnMobileOtp);
+                    Toast.makeText(LoginActivity.this, "OTP verification sent to registered phone number", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+        // Fingerprint button
+        if (btnFingerprint != null) {
+            btnFingerprint.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    AnimationHelper.animateButtonPress(LoginActivity.this, btnFingerprint);
+                    Toast.makeText(LoginActivity.this, "Sensor ready. Touch fingerprint sensor to sign in", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+
+        // Register link navigation
         tvRegisterLink.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -71,6 +113,7 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
+        // Forgot password navigation
         tvForgotPassword.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -82,28 +125,21 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     private void runStaggeredEntryAnimations() {
-        // Logo (300ms)
-        Animation logoAnim = AnimationUtils.loadAnimation(this, R.anim.scale_up);
-        imgLogo.startAnimation(logoAnim);
+        if (imgLogo != null) {
+            Animation logoAnim = AnimationUtils.loadAnimation(this, R.anim.scale_up);
+            imgLogo.startAnimation(logoAnim);
+        }
 
-        // Email (400ms delay)
-        Animation slideUpEmail = AnimationUtils.loadAnimation(this, R.anim.slide_up);
-        slideUpEmail.setStartOffset(100);
-        tilEmail.startAnimation(slideUpEmail);
+        if (btnLogin != null) {
+            Animation scaleBtn = AnimationUtils.loadAnimation(this, R.anim.scale_up);
+            scaleBtn.setStartOffset(200);
+            btnLogin.startAnimation(scaleBtn);
+        }
 
-        // Password (500ms delay)
-        Animation slideUpPass = AnimationUtils.loadAnimation(this, R.anim.slide_up);
-        slideUpPass.setStartOffset(200);
-        tilPassword.startAnimation(slideUpPass);
-
-        // Button (600ms delay)
-        Animation scaleBtn = AnimationUtils.loadAnimation(this, R.anim.scale_up);
-        scaleBtn.setStartOffset(300);
-        btnLogin.startAnimation(scaleBtn);
-
-        // Register link (700ms delay)
-        Animation fadeReg = AnimationUtils.loadAnimation(this, R.anim.fade_in);
-        fadeReg.setStartOffset(400);
-        tvRegisterLink.startAnimation(fadeReg);
+        if (tvRegisterLink != null) {
+            Animation fadeReg = AnimationUtils.loadAnimation(this, R.anim.fade_in);
+            fadeReg.setStartOffset(350);
+            tvRegisterLink.startAnimation(fadeReg);
+        }
     }
 }
