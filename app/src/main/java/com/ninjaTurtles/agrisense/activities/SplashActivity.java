@@ -60,11 +60,17 @@ public class SplashActivity extends AppCompatActivity {
             }
         }, 500);
 
-        // Step 6: After ~2.2 seconds -> transition to Login Activity with smooth enter/exit animation
+        // Step 6: After ~2.2 seconds -> transition to appropriate Activity
         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
             public void run() {
-                Intent intent = new Intent(SplashActivity.this, LoginActivity.class);
+                com.google.firebase.auth.FirebaseAuth auth = com.google.firebase.auth.FirebaseAuth.getInstance();
+                Intent intent;
+                if (auth.getCurrentUser() != null) {
+                    intent = new Intent(SplashActivity.this, MainActivity.class);
+                } else {
+                    intent = new Intent(SplashActivity.this, LoginActivity.class);
+                }
                 startActivity(intent);
                 overridePendingTransition(R.anim.slide_in_right, R.anim.slide_out_left);
                 finish();

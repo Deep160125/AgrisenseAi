@@ -18,6 +18,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.ninjaTurtles.agrisense.R;
 import com.ninjaTurtles.agrisense.utils.AnimationHelper;
 import com.google.android.material.button.MaterialButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -29,6 +31,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     private boolean isPasswordVisible = false;
     private boolean isConfirmPasswordVisible = false;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +52,7 @@ public class RegisterActivity extends AppCompatActivity {
         btnRegister = findViewById(R.id.btnRegister);
         tvLoginLink = findViewById(R.id.tvLoginLink);
 
+        mAuth = FirebaseAuth.getInstance();
         setupLabelAsterisks();
 
         // Back button navigation
@@ -102,16 +106,37 @@ public class RegisterActivity extends AppCompatActivity {
 
                 String fullName = etFullName != null ? etFullName.getText().toString().trim() : "";
                 String email = etRegEmail != null ? etRegEmail.getText().toString().trim() : "";
+                String mobile = etMobileNumber != null ? etMobileNumber.getText().toString().trim() : "";
                 String password = etRegPassword != null ? etRegPassword.getText().toString().trim() : "";
                 String confirmPassword = etConfirmPassword != null ? etConfirmPassword.getText().toString().trim() : "";
 
                 if (TextUtils.isEmpty(fullName)) {
-                    Toast.makeText(RegisterActivity.this, "Please enter your full name", Toast.LENGTH_SHORT).show();
+                    etFullName.setError("Full name is required");
                     return;
                 }
 
-                if (!TextUtils.isEmpty(password) && !password.equals(confirmPassword)) {
-                    Toast.makeText(RegisterActivity.this, "Passwords do not match", Toast.LENGTH_SHORT).show();
+                if (TextUtils.isEmpty(email)) {
+                    etRegEmail.setError("Email is required");
+                    return;
+                }
+                
+                if (TextUtils.isEmpty(mobile)) {
+                    etMobileNumber.setError("Mobile number is required");
+                    return;
+                }
+                
+                if (TextUtils.isEmpty(password)) {
+                    etRegPassword.setError("Password is required");
+                    return;
+                }
+                
+                if (password.length() < 6) {
+                    etRegPassword.setError("Password must be >= 6 characters");
+                    return;
+                }
+
+                if (!password.equals(confirmPassword)) {
+                    etConfirmPassword.setError("Passwords do not match");
                     return;
                 }
 
@@ -120,15 +145,24 @@ public class RegisterActivity extends AppCompatActivity {
                     return;
                 }
 
-                Toast.makeText(RegisterActivity.this, "Account Created Successfully!", Toast.LENGTH_SHORT).show();
-                new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
-                        startActivity(intent);
-                        finishAffinity();
-                    }
-                }, 200);
+                btnRegister.setEnabled(false);
+                mAuth.createUserWithEmailAndPassword(email, password)
+                        .addOnCompleteListener(task -> {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(RegisterActivity.this, "Account Created Successfully!", Toast.LENGTH_SHORT).show();
+                                new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        Intent intent = new Intent(RegisterActivity.this, MainActivity.class);
+                                        startActivity(intent);
+                                        finishAffinity();
+                                    }
+                                }, 200);
+                            } else {
+                                Toast.makeText(RegisterActivity.this, "Error: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                                btnRegister.setEnabled(true);
+                            }
+                        });
             }
         });
 

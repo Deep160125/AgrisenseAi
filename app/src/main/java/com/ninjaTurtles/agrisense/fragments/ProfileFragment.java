@@ -44,6 +44,7 @@ public class ProfileFragment extends Fragment {
         cardOptionLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                com.google.firebase.auth.FirebaseAuth.getInstance().signOut();
                 Toast.makeText(getContext(), "Logged Out Successfully", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(getActivity(), LoginActivity.class);
                 intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
